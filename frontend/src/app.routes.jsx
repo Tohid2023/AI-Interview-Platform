@@ -1,4 +1,3 @@
-
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Login from "./features/auth/pages/Login";
 import Register from "./features/auth/pages/Register";
@@ -14,18 +13,19 @@ const ErrorPage = () => (
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <Navigate to="/login" replace />
+    element: <h1>Home page</h1>,
+    // element: <Navigate to="/login" replace />
   },
   {
     path: "/login",
-    element: <Login />
+    element: <Login />,
   },
   {
     path: "/register",
-    element: <Register />
+    element: <Register />,
   },
   {
     path: "*",
-    element: <ErrorPage />
-  }
+    element: <ErrorPage />,
+  },
 ]);
