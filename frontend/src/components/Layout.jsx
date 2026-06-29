@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import "../style/layout.scss";
@@ -5,9 +6,11 @@ import "../style/layout.scss";
 const Layout = () => {
   const { user, handleLogout } = useAuth();
   const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogoutClick = async () => {
     try {
+      setMobileMenuOpen(false);
       navigate("/", { replace: true });
       setTimeout(async () => {
         await handleLogout();
@@ -24,11 +27,13 @@ const Layout = () => {
 
   const displayName = user?.username || user?.email?.split("@")[0] || "User";
 
+  const closeMobileMenu = () => setMobileMenuOpen(false);
+
   return (
     <div className="app-layout">
       <header className="navbar">
         <div className="navbar-container">
-          <Link to={user ? "/create" : "/"} className="navbar-logo">
+          <Link to={user ? "/create" : "/"} className="navbar-logo" onClick={closeMobileMenu}>
             <svg
               className="logo-icon"
               width="24"
@@ -106,7 +111,83 @@ const Layout = () => {
               </>
             )}
           </div>
+
+          <button className="hamburger-btn" onClick={() => setMobileMenuOpen(!mobileMenuOpen)} aria-label="Toggle menu">
+            {mobileMenuOpen ? (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="4" y1="12" x2="20" y2="12"></line>
+                <line x1="4" y1="6" x2="20" y2="6"></line>
+                <line x1="4" y1="18" x2="20" y2="18"></line>
+              </svg>
+            )}
+          </button>
         </div>
+
+        {/* Mobile Menu Panel */}
+        {mobileMenuOpen && (
+          <div className="mobile-nav-panel">
+            <nav className="mobile-menu-links">
+              {user ? (
+                <>
+                  <Link to="/create-plan" className="mobile-menu-link" onClick={closeMobileMenu}>Create Plan</Link>
+                  <Link to="/recent" className="mobile-menu-link" onClick={closeMobileMenu}>Recent Plans</Link>
+                  <div className="mobile-profile-section">
+                    <div className="user-profile">
+                      <div className="avatar">{getInitials(displayName)}</div>
+                      <span className="username">{displayName}</span>
+                    </div>
+                  </div>
+                  <button onClick={handleLogoutClick} className="mobile-logout-button">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                      <polyline points="16 17 21 12 16 7" />
+                      <line x1="21" x2="9" y1="12" y2="12" />
+                    </svg>
+                    <span>Logout</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <a href="#features" className="mobile-menu-link" onClick={(e) => {
+                    e.preventDefault();
+                    closeMobileMenu();
+                    document.querySelector(".features-section")?.scrollIntoView({ behavior: "smooth" });
+                  }}>Features</a>
+                  <a href="#preview" className="mobile-menu-link" onClick={(e) => {
+                    e.preventDefault();
+                    closeMobileMenu();
+                    document.querySelector(".preview-section")?.scrollIntoView({ behavior: "smooth" });
+                  }}>Preview</a>
+                  <hr className="mobile-menu-divider" />
+                  <Link to="/login" className="mobile-menu-link" onClick={closeMobileMenu}>Login</Link>
+                  <Link to="/register" className="button primary-button mobile-cta-btn" onClick={closeMobileMenu} style={{ 
+                    background: "linear-gradient(135deg, #ff2d78 0%, #d91c5c 100%)", 
+                    color: "#fff", 
+                    textDecoration: "none", 
+                    padding: "0.75rem 1.2rem", 
+                    borderRadius: "0.5rem", 
+                    fontWeight: "600",
+                    textAlign: "center"
+                  }}>Get Started</Link>
+                </>
+              )}
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="main-content">
