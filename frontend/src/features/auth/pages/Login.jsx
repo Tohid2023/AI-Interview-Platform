@@ -6,13 +6,28 @@ import { useAuth } from "../hooks/useAuth";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { loading, handleLogin } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await handleLogin({ email, password });
-    navigate("/create");
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setError("");
+    setIsSubmitting(true);
+    const result = await handleLogin({ email, password });
+    setIsSubmitting(false);
+
+    if (result?.success) {
+      navigate("/create");
+    } else {
+      setError(result?.message || "Invalid email or password");
+    }
   };
 
   if (loading) {
@@ -28,10 +43,13 @@ const Login = () => {
       <div className="form-container">
         <h1>Login</h1>
 
+        {error && <div className="error-message">{error}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="input-group">
             <label htmlFor="email">Email</label>
             <input
+              value={email}
               onChange={(e) => {
                 setEmail(e.target.value);
               }}
@@ -39,11 +57,14 @@ const Login = () => {
               id="email"
               name="email"
               placeholder="Enter email address"
+              required
+              disabled={isSubmitting}
             />
           </div>
           <div className="input-group">
             <label htmlFor="password">Password</label>
             <input
+              value={password}
               onChange={(e) => {
                 setPassword(e.target.value);
               }}
@@ -51,10 +72,18 @@ const Login = () => {
               id="password"
               name="password"
               placeholder="Enter password"
+              required
+              disabled={isSubmitting}
             />
           </div>
 
-          <button className="button primary-button">Login</button>
+          <button 
+            type="submit" 
+            className="button primary-button" 
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? "Logging in..." : "Login"}
+          </button>
         </form>
 
         <p>
