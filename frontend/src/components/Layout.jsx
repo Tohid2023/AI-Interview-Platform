@@ -197,7 +197,7 @@ const Layout = () => {
       <footer className="footer">
         <div className="footer-container">
           <p className="copyright">
-            &copy; {new Date().getFullYear()} InterviewAI. All rights reserved.
+            &copy; {new Date().getFullYear()} InterviewAI. All rights reserved. Created with ❤️ by Tohid
           </p>
           <div className="footer-links">
             <a href="#" className="footer-link">Privacy Policy</a>
