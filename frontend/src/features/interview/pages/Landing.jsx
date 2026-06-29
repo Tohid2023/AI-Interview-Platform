@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/hooks/useAuth";
 import "../../../style/landing.scss";
@@ -5,6 +6,7 @@ import "../../../style/landing.scss";
 const Landing = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const handleCTA = () => {
     if (user) {
@@ -91,39 +93,40 @@ const Landing = () => {
                   <path d="M19 10v1a7 7 0 0 1-14 0v-1" />
                   <line x1="12" x2="12" y1="19" y2="22" />
                 </svg>
-                <span>Mock Strategy Preview</span>
+                <span>Interactive Platform Preview</span>
               </div>
-              <span className="status-badge">Ready</span>
+              <div className="preview-tabs">
+                <button 
+                  className={`preview-tab-btn ${activeTab === "dashboard" ? "active" : ""}`}
+                  onClick={() => setActiveTab("dashboard")}
+                >
+                  Dashboard
+                </button>
+                <button 
+                  className={`preview-tab-btn ${activeTab === "strategy" ? "active" : ""}`}
+                  onClick={() => setActiveTab("strategy")}
+                >
+                  Interview Report
+                </button>
+              </div>
             </div>
 
-            <div className="preview-body">
-              <div className="preview-main">
-                <div className="preview-question-card">
-                  <h4>Q1: Explain virtual DOM rendering in React.</h4>
-                  <p><strong>Intention:</strong> Tests core understanding of React reconciliation algorithms and diffing processes.</p>
-                </div>
-                <div className="preview-question-card">
-                  <h4>Q2: How do you optimize Node.js database pools?</h4>
-                  <p><strong>Intention:</strong> Validates experience in high-concurrency systems and connection scaling limits.</p>
-                </div>
-              </div>
-
-              <div className="preview-sidebar">
-                <div className="score-circle">
-                  <span className="score-val">87%</span>
-                  <span className="score-lbl">Match</span>
-                </div>
-                <div className="gap-list">
-                  <div className="gap-item">
-                    <span>Docker / Containers</span>
-                    <span className="gap-severity">High</span>
-                  </div>
-                  <div className="gap-item">
-                    <span>Redis Caching</span>
-                    <span className="gap-severity">Medium</span>
+            <div className="preview-body-image">
+              {activeTab === "dashboard" ? (
+                <div className="preview-image-wrapper">
+                  <img src="/dashboard-preview.png" alt="InterviewAI Dashboard Preview" className="preview-screenshot" />
+                  <div className="preview-overlay">
+                    <span className="overlay-badge">Plan Planner Dashboard</span>
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className="preview-image-wrapper">
+                  <img src="/interview-preview.png" alt="InterviewAI Strategy Report Preview" className="preview-screenshot" />
+                  <div className="preview-overlay">
+                    <span className="overlay-badge">Tailored AI Interview Questions & Roadmap</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -1,13 +1,66 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import "../../../style/home.scss";
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
-import { useAuth } from '../../auth/hooks/useAuth'
 import { motion } from 'framer-motion'
 
+const StrategyLoader = () => {
+    const [currentStep, setCurrentStep] = useState(0);
+    const steps = [
+        "Analyzing job description and requirements...",
+        "Evaluating candidate profile matching...",
+        "Identifying technology stack alignments...",
+        "Synthesizing customized technical questions...",
+        "Generating behavioral scenarios and answers...",
+        "Formulating preparation roadmap & strategy..."
+    ];
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentStep((prev) => (prev < steps.length - 1 ? prev + 1 : prev));
+        }, 2200);
+        return () => clearInterval(interval);
+    }, [steps.length]);
+
+    return (
+        <main className='loading-screen'>
+            <div className="loader-container">
+                <div className="loader-spinner">
+                    <div className="spinner-inner"></div>
+                </div>
+                <h1 className="loader-title">Generating Your Strategy</h1>
+                <p className="loader-subtitle">Our AI is analyzing the job description and your profile to craft a customized preparation plan...</p>
+                <div className="loader-steps">
+                    {steps.map((step, idx) => {
+                        let status = "upcoming";
+                        if (idx < currentStep) status = "completed";
+                        else if (idx === currentStep) status = "active";
+
+                        return (
+                            <div key={idx} className={`loader-step ${status}`}>
+                                <div className="step-icon">
+                                    {status === "completed" ? (
+                                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ display: 'block' }}>
+                                            <polyline points="20 6 9 17 4 12"></polyline>
+                                        </svg>
+                                    ) : status === "active" ? (
+                                        <div className="pulse-dot"></div>
+                                    ) : (
+                                        <div className="dot"></div>
+                                    )}
+                                </div>
+                                <span className="step-text">{step}</span>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+        </main>
+    );
+};
+
 const Home = () => {
-    const { loading, generateReport, reports } = useInterview()
-    const { user } = useAuth()
+    const { loading, generateReport } = useInterview()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
     const [ uploadedFile, setUploadedFile ] = useState(null)
@@ -15,7 +68,6 @@ const Home = () => {
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
-    const displayName = user?.username || user?.email?.split("@")[0] || "Tohid"
 
     const handleFileChange = (e) => {
         const file = e.target.files[0]
@@ -89,24 +141,7 @@ const Home = () => {
         }
     }
 
-    // Statistics calculations
-    const totalPlans = (reports || []).length
-    const avgScore = totalPlans > 0
-        ? Math.round(reports.reduce((acc, r) => acc + (r.matchScore || 0), 0) / totalPlans)
-        : 0
-    const lastReport = reports && reports[0] ? reports[0] : null
-
     const isFormValid = jobDescription.trim().length > 0 && (uploadedFile !== null || selfDescription.trim().length > 0)
-
-    // Determine active workflow step
-    let activeStep = 1
-    if (jobDescription.trim().length > 0) {
-        if (uploadedFile !== null || selfDescription.trim().length > 0) {
-            activeStep = 3
-        } else {
-            activeStep = 2
-        }
-    }
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -124,22 +159,7 @@ const Home = () => {
     }
 
     if (loading) {
-        return (
-            <main className='loading-screen'>
-                <div className="loader-container">
-                    <div className="loader-spinner">
-                        <div className="spinner-inner"></div>
-                    </div>
-                    <h1 className="loader-title">Generating Your Strategy</h1>
-                    <p className="loader-subtitle">Our AI is analyzing the job description and your profile to craft a customized preparation plan...</p>
-                    <div className="loader-steps">
-                        <div className="loader-step active">Analyzing job requirements...</div>
-                        <div className="loader-step active">Evaluating profile matching...</div>
-                        <div className="loader-step active">Synthesizing questions & roadmap...</div>
-                    </div>
-                </div>
-            </main>
-        )
+        return <StrategyLoader />
     }
 
     return (

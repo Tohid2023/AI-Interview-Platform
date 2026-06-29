@@ -35,14 +35,11 @@ export const useAuth = () => {
   };
 
   const handleLogout = async () => {
-    setLoading(true);
     try {
       await logout();
       setUser(null);
     } catch (err) {
       console.error(err);
-    } finally {
-      setLoading(false);
     }
   };
 

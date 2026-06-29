@@ -1,11 +1,21 @@
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../features/auth/hooks/useAuth";
 import "../style/layout.scss";
 
 const Layout = () => {
   const { user, handleLogout } = useAuth();
-  const location = useLocation();
   const navigate = useNavigate();
+
+  const handleLogoutClick = async () => {
+    try {
+      navigate("/", { replace: true });
+      setTimeout(async () => {
+        await handleLogout();
+      }, 150);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const getInitials = (name) => {
     if (!name) return "?";
@@ -64,7 +74,7 @@ const Layout = () => {
                   <div className="avatar">{getInitials(displayName)}</div>
                   <span className="username">{displayName}</span>
                 </div>
-                <button onClick={handleLogout} className="logout-button" title="Logout">
+                <button onClick={handleLogoutClick} className="logout-button" title="Logout">
                   <svg
                     width="18"
                     height="18"

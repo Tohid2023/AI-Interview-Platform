@@ -246,96 +246,81 @@ $font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Robot
       }
     }
 
-    .preview-body {
-      display: grid;
-      grid-template-columns: 1.8fr 1.2fr;
-      gap: 2.5rem;
-    }
-
-    .preview-main {
+    .preview-tabs {
       display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
+      gap: 0.75rem;
 
-      .preview-question-card {
-        background-color: rgba($bg-page, 0.5);
+      .preview-tab-btn {
+        background: rgba($bg-page, 0.45);
         border: 1px solid $border-color;
-        border-radius: 0.75rem;
-        padding: 1.25rem;
-        box-sizing: border-box;
+        color: $text-muted;
+        padding: 0.5rem 1.25rem;
+        border-radius: 0.5rem;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-family: $font-stack;
 
-        h4 {
-          margin: 0 0 0.5rem 0;
-          font-size: 0.95rem;
-          font-weight: 600;
-          text-align: left;
+        &:hover {
+          color: $text-primary;
+          border-color: rgba($accent, 0.5);
         }
 
-        p {
-          margin: 0;
-          font-size: 0.85rem;
-          color: $text-muted;
-          line-height: 1.5;
-          text-align: left;
+        &.active {
+          color: #fff;
+          background: $accent;
+          border-color: $accent;
+          box-shadow: 0 0 12px rgba($accent, 0.35);
         }
       }
     }
 
-    .preview-sidebar {
-      background-color: rgba($bg-page, 0.4);
-      border: 1px solid $border-color;
-      border-radius: 1rem;
-      padding: 1.75rem;
+    .preview-body-image {
+      width: 100%;
       display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
+      justify-content: center;
+      align-items: center;
       box-sizing: border-box;
+    }
 
-      .score-circle {
-        align-self: center;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        border: 6px solid $border-color;
-        border-top-color: $accent;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+    .preview-image-wrapper {
+      position: relative;
+      width: 100%;
+      border-radius: 1rem;
+      overflow: hidden;
+      border: 1px solid rgba($border-color, 0.8);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.55);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
 
-        .score-val {
-          font-size: 1.75rem;
-          font-weight: 800;
-          color: $text-primary;
-        }
-
-        .score-lbl {
-          font-size: 0.7rem;
-          color: $text-muted;
-          text-transform: uppercase;
-          font-weight: 700;
-        }
+      &:hover {
+        transform: scale(1.008);
+        border-color: rgba($accent, 0.65);
       }
 
-      .gap-list {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
+      .preview-screenshot {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
 
-        .gap-item {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.8rem;
-          background-color: rgba($bg-card, 0.8);
-          padding: 0.5rem 0.75rem;
-          border-radius: 0.5rem;
+      .preview-overlay {
+        position: absolute;
+        bottom: 1.25rem;
+        left: 1.25rem;
+        z-index: 10;
+
+        .overlay-badge {
+          background-color: rgba($bg-page, 0.85);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
           border: 1px solid $border-color;
-          box-sizing: border-box;
-
-          .gap-severity {
-            color: $accent;
-            font-weight: 600;
-          }
+          color: $text-primary;
+          font-size: 0.8rem;
+          font-weight: 600;
+          padding: 0.5rem 1rem;
+          border-radius: 0.5rem;
+          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
         }
       }
     }

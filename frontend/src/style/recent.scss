@@ -1,117 +1,252 @@
 @use "sass:color";
 
-$bg-page:        #0d1117;
-$bg-card:        #161b22;
-$border-color:   #2a3348;
-$text-primary:   #e6edf3;
-$text-muted:     #7d8590;
-$accent:         #ff2d78;
+$bg-page:        #070a0e;
+$bg-card:        #0f131a;
+$border-color:   #1f2937;
+$text-primary:   #f3f4f6;
+$text-muted:     #9ca3af;
+$accent:         #ff3b8d;
+$accent-glow:    rgba(255, 59, 141, 0.15);
+$font-stack:     Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+$severity-high:   #ff4d4d;
+$severity-medium: #f5a623;
+$severity-low:    #3fb950;
 
 .recent-plans-page {
-  max-width: 1200px;
-  margin: 4rem auto;
+  max-width: 1100px;
+  margin: 2rem auto;
   padding: 0 1.5rem;
   box-sizing: border-box;
+  font-family: $font-stack;
+  color: $text-primary;
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
 
   .dashboard-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 2.5rem;
     flex-wrap: wrap;
     gap: 1rem;
+    border-bottom: 1px solid rgba($border-color, 0.5);
+    padding-bottom: 1.5rem;
 
     h2 {
-      font-size: 1.75rem;
+      font-size: 1.6rem;
       font-weight: 700;
       color: $text-primary;
       margin: 0;
       letter-spacing: -0.02em;
+    }
+
+    .back-icon-btn {
+      background-color: transparent;
+      border: 1px solid $border-color;
+      color: $text-muted;
+      width: 38px;
+      height: 38px;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+
+      &:hover {
+        border-color: $accent;
+        color: $accent;
+        background-color: rgba($accent, 0.05);
+        transform: translateX(-2px);
+      }
+    }
+
+    .create-plan-btn {
+      background: linear-gradient(135deg, $accent 0%, color.adjust($accent, $lightness: -10%) 100%);
+      color: #fff;
+      border: none;
+      padding: 0.65rem 1.25rem;
+      border-radius: 0.6rem;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 14px rgba($accent, 0.25);
+      transition: all 0.2s ease;
+
+      &:hover {
+        box-shadow: 0 6px 20px rgba($accent, 0.4);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(1px);
+      }
     }
   }
 
   .plans-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2.5rem;
+    gap: 1.75rem;
     list-style: none;
     padding: 0;
     margin: 0;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
   }
 
   .plan-card {
-    background-color: $bg-card;
-    border: 1px solid $border-color;
+    background: linear-gradient(135deg, rgba($bg-card, 0.7) 0%, rgba(#141922, 0.5) 100%);
+    border: 1px solid rgba($border-color, 0.7);
     border-radius: 1rem;
-    padding: 2.25rem 2rem;
+    padding: 1.75rem;
     cursor: pointer;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    gap: 1.25rem;
     box-sizing: border-box;
+    backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 
-    &:hover {
-      transform: translateY(-6px);
+    &.border-high:hover {
+      border-color: $severity-low;
+      box-shadow: 0 8px 30px rgba($severity-low, 0.12);
+    }
+
+    &.border-mid:hover {
+      border-color: $severity-medium;
+      box-shadow: 0 8px 30px rgba($severity-medium, 0.12);
+    }
+
+    &.border-low:hover {
       border-color: $accent;
-      box-shadow: 0 12px 36px rgba($accent, 0.15);
-
-      .card-header .icon-container {
-        background-color: rgba($accent, 0.15);
-        color: $accent;
-      }
+      box-shadow: 0 8px 30px rgba($accent, 0.12);
     }
 
     .card-header {
       display: flex;
-      align-items: flex-start;
+      justify-content: space-between;
+      align-items: center;
       gap: 1rem;
 
+      .header-left {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        flex: 1;
+        min-width: 0;
+      }
+
       .icon-container {
-        width: 44px;
-        height: 44px;
-        border-radius: 0.75rem;
-        background-color: rgba($text-muted, 0.1);
-        color: $text-muted;
+        width: 42px;
+        height: 42px;
+        border-radius: 0.65rem;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-shrink: 0;
-        transition: background-color 0.2s, color 0.2s;
+
+        &.icon-high {
+          background-color: rgba($severity-low, 0.08);
+          color: $severity-low;
+          border: 1px solid rgba($severity-low, 0.15);
+        }
+
+        &.icon-mid {
+          background-color: rgba($severity-medium, 0.08);
+          color: $severity-medium;
+          border: 1px solid rgba($severity-medium, 0.15);
+        }
+
+        &.icon-low {
+          background-color: rgba($accent, 0.08);
+          color: $accent;
+          border: 1px solid rgba($accent, 0.15);
+        }
       }
 
       .title-section {
+        flex: 1;
+        min-width: 0;
+
         h3 {
-          font-size: 1.25rem;
-          font-weight: 650;
-          margin: 0 0 0.25rem 0;
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin: 0;
           color: $text-primary;
-          line-height: 1.3;
           text-align: left;
+          text-overflow: ellipsis;
+          overflow: hidden;
+          white-space: nowrap;
         }
 
         .date-text {
-          font-size: 0.825rem;
+          font-size: 0.8rem;
           color: $text-muted;
           display: flex;
           align-items: center;
           gap: 0.25rem;
+          margin-top: 0.15rem;
+
+          svg {
+            color: $text-muted;
+            opacity: 0.8;
+          }
         }
       }
+
+      .delete-card-btn {
+        background: transparent;
+        border: none;
+        color: $text-muted;
+        cursor: pointer;
+        padding: 0.4rem;
+        border-radius: 0.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+
+        &:hover {
+          color: #ff3b8d;
+          background-color: rgba(#ff3b8d, 0.1);
+          transform: scale(1.05);
+        }
+      }
+    }
+
+    .card-description {
+      font-size: 0.85rem;
+      color: $text-muted;
+      margin: 0;
+      line-height: 1.5;
+      text-align: left;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .match-section {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: 0.4rem;
 
       .match-label-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
         font-weight: 600;
 
         .label {
@@ -119,49 +254,48 @@ $accent:         #ff2d78;
         }
 
         .value {
-          &.high { color: #4caf50; }
-          &.mid { color: #ff9800; }
-          &.low { color: #f44336; }
+          &.high { color: $severity-low; }
+          &.mid { color: $severity-medium; }
+          &.low { color: $accent; }
         }
       }
 
       .progress-bar-bg {
         height: 6px;
         background-color: rgba($border-color, 0.5);
-        border-radius: 10px;
+        border-radius: 99px;
         overflow: hidden;
       }
 
       .progress-bar-fill {
         height: 100%;
-        border-radius: 10px;
+        border-radius: 99px;
         transition: width 0.3s ease;
 
-        &.high { background: linear-gradient(90deg, #4caf50, #81c784); }
-        &.mid { background: linear-gradient(90deg, #ff9800, #ffb74d); }
-        &.low { background: linear-gradient(90deg, #f44336, #e57373); }
+        &.high { background: linear-gradient(90deg, $severity-low, #5cd670); }
+        &.mid { background: linear-gradient(90deg, $severity-medium, #ffc366); }
+        &.low { background: linear-gradient(90deg, $accent, #ff7ab2); }
       }
     }
 
     .details-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
       border-top: 1px solid rgba($border-color, 0.4);
-      padding-top: 1.25rem;
-      margin-top: auto;
+      padding-top: 1rem;
+      margin-top: 0.25rem;
 
       .detail-item {
         display: flex;
         align-items: center;
-        gap: 0.5rem;
-        font-size: 0.825rem;
+        gap: 0.4rem;
+        font-size: 0.8rem;
         color: $text-muted;
-        text-align: left;
 
         svg {
-          color: rgba($text-muted, 0.7);
-          flex-shrink: 0;
+          color: $text-muted;
+          opacity: 0.7;
         }
 
         strong {
@@ -170,11 +304,74 @@ $accent:         #ff2d78;
       }
     }
   }
+
+  // Loading, Empty States
+  .loading-state {
+    text-align: center;
+    padding: 6rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid rgba($accent, 0.1);
+      border-top-color: $accent;
+      border-radius: 50%;
+      animation: spin 1s infinite linear;
+    }
+
+    p {
+      color: $text-muted;
+      font-size: 0.95rem;
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    background: linear-gradient(135deg, rgba($bg-card, 0.7) 0%, rgba(#141922, 0.5) 100%);
+    border: 1px solid $border-color;
+    border-radius: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+
+    h3 {
+      font-size: 1.25rem;
+      color: $text-primary;
+      margin: 0;
+    }
+
+    p {
+      color: $text-muted;
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    .get-started-btn {
+      background: linear-gradient(135deg, $accent 0%, color.adjust($accent, $lightness: -10%) 100%);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1.5rem;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 14px rgba($accent, 0.2);
+
+      &:hover {
+        box-shadow: 0 6px 18px rgba($accent, 0.35);
+        transform: translateY(-1px);
+      }
+    }
+  }
 }
 
-@media (max-width: 800px) {
-  .recent-plans-page .plans-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }

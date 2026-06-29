@@ -16,9 +16,8 @@ export const useInterview = () => {
 
     const generateReport = useCallback(async ({ jobDescription, selfDescription, resumeFile }) => {
         setLoading(true)
-        let response = null
         try {
-            response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
+            const response = await generateInterviewReport({ jobDescription, selfDescription, resumeFile })
             if (response && response.interviewReport) {
                 setReport(response.interviewReport)
                 return response.interviewReport
