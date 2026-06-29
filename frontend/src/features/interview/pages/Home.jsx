@@ -1,166 +1,312 @@
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import "../../../style/home.scss";
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router'
+import { useAuth } from '../../auth/hooks/useAuth'
+import { motion } from 'framer-motion'
 
 const Home = () => {
-
-    const { loading, generateReport,reports } = useInterview()
+    const { loading, generateReport, reports } = useInterview()
+    const { user } = useAuth()
     const [ jobDescription, setJobDescription ] = useState("")
     const [ selfDescription, setSelfDescription ] = useState("")
+    const [ uploadedFile, setUploadedFile ] = useState(null)
+    const [ isDragging, setIsDragging ] = useState(false)
     const resumeInputRef = useRef()
 
     const navigate = useNavigate()
+    const displayName = user?.username || user?.email?.split("@")[0] || "Tohid"
+
+    const handleFileChange = (e) => {
+        const file = e.target.files[0]
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert("File size exceeds 5MB limit.")
+                return
+            }
+            setUploadedFile(file)
+        }
+    }
+
+    const handleDragOver = (e) => {
+        e.preventDefault()
+        setIsDragging(true)
+    }
+
+    const handleDragLeave = (e) => {
+        e.preventDefault()
+        setIsDragging(false)
+    }
+
+    const handleDrop = (e) => {
+        e.preventDefault()
+        setIsDragging(false)
+        const files = e.dataTransfer.files
+        if (files && files[0]) {
+            const file = files[0]
+            if (file.size > 5 * 1024 * 1024) {
+                alert("File size exceeds 5MB limit.")
+                return
+            }
+            const name = file.name.toLowerCase()
+            if (name.endsWith(".pdf") || name.endsWith(".docx")) {
+                setUploadedFile(file)
+                if (resumeInputRef.current) {
+                    const dataTransfer = new DataTransfer()
+                    dataTransfer.items.add(file)
+                    resumeInputRef.current.files = dataTransfer.files
+                }
+            } else {
+                alert("Only PDF or DOCX files are allowed.")
+            }
+        }
+    }
+
+    const handleRemoveFile = (e) => {
+        e.preventDefault()
+        e.stopPropagation()
+        setUploadedFile(null)
+        if (resumeInputRef.current) {
+            resumeInputRef.current.value = ""
+        }
+    }
 
     const handleGenerateReport = async () => {
-        const resumeFile = resumeInputRef.current.files[ 0 ]
-        const data = await generateReport({ jobDescription, selfDescription, resumeFile })
-        navigate(`/interview/${data._id}`)
+        if (!jobDescription.trim()) {
+            alert("Please enter target job description.")
+            return
+        }
+        if (!uploadedFile && !selfDescription.trim()) {
+            alert("Please upload a resume or provide a quick self-description.")
+            return
+        }
+
+        const data = await generateReport({ jobDescription, selfDescription, resumeFile: uploadedFile })
+        if (data && data._id) {
+            navigate(`/interview/${data._id}`)
+        } else {
+            alert("Failed to generate interview strategy. Please verify your inputs and try again.")
+        }
+    }
+
+    // Statistics calculations
+    const totalPlans = (reports || []).length
+    const avgScore = totalPlans > 0
+        ? Math.round(reports.reduce((acc, r) => acc + (r.matchScore || 0), 0) / totalPlans)
+        : 0
+    const lastReport = reports && reports[0] ? reports[0] : null
+
+    const isFormValid = jobDescription.trim().length > 0 && (uploadedFile !== null || selfDescription.trim().length > 0)
+
+    // Determine active workflow step
+    let activeStep = 1
+    if (jobDescription.trim().length > 0) {
+        if (uploadedFile !== null || selfDescription.trim().length > 0) {
+            activeStep = 3
+        } else {
+            activeStep = 2
+        }
+    }
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        show: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.08
+            }
+        }
+    }
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 15 },
+        show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } }
     }
 
     if (loading) {
         return (
             <main className='loading-screen'>
-                <h1>Loading your interview plan...</h1>
+                <div className="loader-container">
+                    <div className="loader-spinner">
+                        <div className="spinner-inner"></div>
+                    </div>
+                    <h1 className="loader-title">Generating Your Strategy</h1>
+                    <p className="loader-subtitle">Our AI is analyzing the job description and your profile to craft a customized preparation plan...</p>
+                    <div className="loader-steps">
+                        <div className="loader-step active">Analyzing job requirements...</div>
+                        <div className="loader-step active">Evaluating profile matching...</div>
+                        <div className="loader-step active">Synthesizing questions & roadmap...</div>
+                    </div>
+                </div>
             </main>
         )
     }
 
-  return (
-    <div className="home-page">
-      {/* Page Header */}
-      <header className="page-header">
-        <h1>
-          Create Your Custom <span className="highlight">Interview Plan</span>
-        </h1>
-        <p>
-          Let our AI analyze the job requirements and your unique profile to
-          build a winning strategy.
-        </p>
-      </header>
+    return (
+        <motion.div 
+            className="home-page"
+            initial="hidden"
+            animate="show"
+            variants={containerVariants}
+            style={{ paddingTop: "2rem" }}
+        >
 
-      {/* Main Card */}
-      <div className="interview-card">
-        <div className="interview-card__body">
-          {/* Left Panel - Job Description */}
-          <div className="panel panel--left">
-            <div className="panel__header">
-              <span className="panel__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>
-              </span>
-              <h2>Target Job Description</h2>
-              <span className="badge badge--required">Required</span>
-            </div>
-            <textarea
-            onChange={(e) => { setJobDescription(e.target.value) }}
-              className="panel__textarea"
-              placeholder={`Paste the full job description here...\ne.g. 'Senior Frontend Engineer at Google requires proficiency in React, TypeScript, and large-scale system design...'`}
-              maxLength={5000}
-            />
-            <div className="char-counter">0 / 5000 chars</div>
-          </div>
+            {/* 4. Creator Form Container */}
+            <motion.div className="create-plan-layout" variants={itemVariants}>
+                {/* Left - Creator Form */}
+                <div className="form-panel">
+                    {/* Back Button */}
+                    <button
+                        onClick={() => navigate("/create")}
+                        style={{
+                            background: "transparent",
+                            border: "none",
+                            color: "#7d8590",
+                            cursor: "pointer",
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.5rem",
+                            padding: "0",
+                            fontSize: "0.9rem",
+                            fontWeight: "600",
+                            marginBottom: "1rem",
+                            transition: "color 0.2s"
+                        }}
+                        onMouseOver={(e) => e.currentTarget.style.color = "#ff3b8d"}
+                        onMouseOut={(e) => e.currentTarget.style.color = "#7d8590"}
+                    >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <line x1="19" y1="12" x2="5" y2="12"></line>
+                            <polyline points="12 19 5 12 12 5"></polyline>
+                        </svg>
+                        Back to Dashboard
+                    </button>
 
-          {/* Vertical Divider */}
-          <div className="panel-divider" />
+                    {/* Job Description Textarea */}
+                    <div className="form-section">
+                        <div className="section-header">
+                            <h3>Target Job Description</h3>
+                            <span className="required-badge">Required</span>
+                        </div>
+                        <div className="input-wrapper">
+                            <textarea
+                                value={jobDescription}
+                                onChange={(e) => setJobDescription(e.target.value)}
+                                placeholder="Paste the full job requirements description here (e.g. Senior React Developer role details...)"
+                                maxLength={5000}
+                            />
+                            <div className="char-counter">{jobDescription.length} / 5000 chars</div>
+                        </div>
+                    </div>
 
-          {/* Right Panel - Profile */}
-          <div className="panel panel--right">
-            <div className="panel__header">
-              <span className="panel__icon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
-              </span>
-              <h2>Your Profile</h2>
-            </div>
+                    {/* Side-by-side Upload & Self Description */}
+                    <div className="form-grid-row">
+                        {/* Resume Upload dropzone */}
+                        <div className="form-section">
+                            <div className="section-header">
+                                <h3>Upload Resume</h3>
+                                <span className="required-badge" style={{ color: "#4caf50", backgroundColor: "rgba(76, 175, 80, 0.1)", borderColor: "rgba(76, 175, 80, 0.2)" }}>Best Results</span>
+                            </div>
 
-            {/* Upload Resume */}
-            <div className="upload-section">
-              <label className="section-label">
-                Upload Resume
-                <span className="badge badge--best">Best Results</span>
-              </label>
-              <label className="dropzone" htmlFor="resume">
-                <span className="dropzone__icon">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 16 12 12 8 16" /><line x1="12" y1="12" x2="12" y2="21" /><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3" /></svg>
-                </span>
-                <p className="dropzone__title">
-                  Click to upload or drag &amp; drop
-                </p>
-                <p className="dropzone__subtitle">PDF or DOCX (Max 5MB)</p>
-                <input ref={resumeInputRef} hidden type='file' id='resume' name='resume' accept='.pdf,.docx' />
-              </label>
-            </div>
+                            {uploadedFile ? (
+                                <motion.div 
+                                    className="file-card"
+                                    initial={{ opacity: 0, scale: 0.95 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    style={{ height: "100%", minHeight: "180px", display: "flex", flexDirection: "column", justifyContent: "center" }}
+                                >
+                                    <div className="file-info">
+                                        <div className="file-icon">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                            </svg>
+                                        </div>
+                                        <div className="file-meta">
+                                            <span className="name" title={uploadedFile.name}>{uploadedFile.name}</span>
+                                            <span className="size">{(uploadedFile.size / (1024 * 1024)).toFixed(2)} MB</span>
+                                        </div>
+                                    </div>
+                                    <div className="file-actions">
+                                        <span className="badge">Ready</span>
+                                        <button 
+                                            type="button" 
+                                            className="remove-btn" 
+                                            onClick={handleRemoveFile}
+                                            title="Remove file"
+                                        >
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </motion.div>
+                            ) : (
+                                <label 
+                                    className={`dropzone ${isDragging ? 'dragging' : ''}`}
+                                    htmlFor="resume"
+                                    onDragOver={handleDragOver}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={handleDrop}
+                                    style={{ height: "100%", minHeight: "180px" }}
+                                >
+                                    <div className="dropzone-icon">
+                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                            <polyline points="17 8 12 3 7 8"></polyline>
+                                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                                        </svg>
+                                    </div>
+                                    <p>Click to upload or drag &amp; drop</p>
+                                    <span className="subtitle">PDF or DOCX (Max 5MB)</span>
+                                    <input 
+                                        ref={resumeInputRef} 
+                                        hidden 
+                                        type='file' 
+                                        id='resume' 
+                                        name='resume' 
+                                        accept='.pdf,.docx' 
+                                        onChange={handleFileChange}
+                                    />
+                                </label>
+                            )}
+                        </div>
 
-            {/* OR Divider */}
-            <div className="or-divider">
-              <span>OR</span>
-            </div>
+                        {/* Quick Self-Description */}
+                        <div className="form-section">
+                            <div className="section-header">
+                                <h3>Quick Self-Description</h3>
+                                <span className="required-badge" style={{ color: "#9ca3af", backgroundColor: "rgba(156, 163, 175, 0.1)", borderColor: "rgba(156, 163, 175, 0.2)" }}>Alternative</span>
+                            </div>
+                            <textarea
+                                value={selfDescription}
+                                onChange={(e) => setSelfDescription(e.target.value)}
+                                className="short-desc"
+                                placeholder="Describe your tech stack, projects, and background experience if you don't have a resume handy..."
+                                style={{ height: "100%", minHeight: "180px", resize: "none" }}
+                            />
+                        </div>
+                    </div>
 
-            {/* Quick Self-Description */}
-            <div className="self-description">
-              <label className="section-label" htmlFor="selfDescription">
-                Quick Self-Description
-              </label>
-              <textarea
-              onChange={(e) => { setSelfDescription(e.target.value) }}
-                id="selfDescription"
-                name="selfDescription"
-                className="panel__textarea panel__textarea--short"
-                placeholder="Briefly describe your experience, key skills, and years of experience if you don't have a resume handy..."
-              />
-            </div>
+                    {/* Generate Button wrapper */}
+                    <div className="generate-btn-wrapper">
+                        <button
+                            onClick={handleGenerateReport}
+                            className="gradient-generate-btn"
+                            disabled={!isFormValid}
+                        >
+                            <svg className="sparkle-icon" width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" />
+                            </svg>
+                            ✨ Generate Interview Strategy
+                        </button>
+                    </div>
+                </div>
+            </motion.div>
 
-            {/* Info Box */}
-            <div className="info-box">
-              <span className="info-box__icon">
-                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" stroke="#1a1f27" strokeWidth="2" /><line x1="12" y1="16" x2="12.01" y2="16" stroke="#1a1f27" strokeWidth="2" /></svg>
-              </span>
-              <p>
-                Either a <strong>Resume</strong> or a{" "}
-                <strong>Self Description</strong> is required to generate a
-                personalized plan.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Card Footer */}
-        <div className="interview-card__footer">
-          <span className="footer-info">
-            AI-Powered Strategy Generation &bull; Approx 30s
-          </span>
-          <button
-                        onClick={handleGenerateReport}
-                        className='generate-btn'>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6z" /></svg>
-            Generate My Interview Strategy
-          </button>
-        </div>
-      </div>
-
-      {/* Recent Reports List */}
-            {reports.length > 0 && (
-                <section className='recent-reports'>
-                    <h2>My Recent Interview Plans</h2>
-                    <ul className='reports-list'>
-                        {reports.map(report => (
-                            <li key={report._id} className='report-item' onClick={() => navigate(`/interview/${report._id}`)}>
-                                <h3>{report.title || 'Untitled Position'}</h3>
-                                <p className='report-meta'>Generated on {new Date(report.createdAt).toLocaleDateString()}</p>
-                                <p className={`match-score ${report.matchScore >= 80 ? 'score--high' : report.matchScore >= 60 ? 'score--mid' : 'score--low'}`}>Match Score: {report.matchScore}%</p>
-                            </li>
-                        ))}
-                    </ul>
-                </section>
-            )}
-
-      {/* Page Footer */}
-      <footer className="page-footer">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">Help Center</a>
-      </footer>
-    </div>
-  );
-};
+        </motion.div>
+    )
+}
 
 export default Home;

@@ -1,5 +1,5 @@
 const pdfParse = require("pdf-parse");
-const generateInterviewReport = require("../services/ai.service");
+const mammoth = require("mammoth");
 const interviewReportModel = require("../models/interviewReport.model");
 const { generateInterviewReport, generateResumePdf } = require("../services/ai.service")
 
@@ -8,29 +8,71 @@ const { generateInterviewReport, generateResumePdf } = require("../services/ai.s
  */
 
 async function generateInterViewReportController(req, res) {
-  const resumeContent = await new pdfParse.PDFParse(
-    Uint8Array.from(req.file.buffer),
-  ).getText();
-  const { selfDescription, jobDescription } = req.body;
+  try {
+    let resumeText = "";
 
-  const interViewReportByAi = await generateInterviewReport({
-    resume: resumeContent.text,
-    selfDescription,
-    jobDescription,
-  });
+    if (req.file) {
+      const mimetype = req.file.mimetype;
+      const isWord = mimetype === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" || 
+                     (req.file.originalname && req.file.originalname.endsWith(".docx"));
 
-  const interviewReport = await interviewReportModel.create({
-    user: req.user.id,
-    resume: resumeContent.text,
-    selfDescription,
-    jobDescription,
-    ...interViewReportByAi,
-  });
+      if (isWord) {
+        const result = await mammoth.extractRawText({ buffer: req.file.buffer });
+        resumeText = result.value;
+      } else {
+        // Assume PDF
+        const resumeContent = await new pdfParse.PDFParse(
+          Uint8Array.from(req.file.buffer),
+        ).getText();
+        resumeText = (typeof resumeContent === "object" && resumeContent !== null) ? (resumeContent.text || JSON.stringify(resumeContent)) : resumeContent;
+      }
+    }
 
-  res.status(201).json({
-    message: "Interview report generated successfully.",
-    interviewReport,
-  });
+    const { selfDescription, jobDescription } = req.body;
+
+    if (!jobDescription) {
+      return res.status(400).json({
+        message: "Job description is required.",
+      });
+    }
+
+    if (!resumeText && !selfDescription) {
+      return res.status(400).json({
+        message: "Either a resume or a self description is required.",
+      });
+    }
+
+    const interViewReportByAi = await generateInterviewReport({
+      resume: resumeText,
+      selfDescription,
+      jobDescription,
+    });
+
+    const interviewReport = await interviewReportModel.create({
+      user: req.user.id,
+      resume: resumeText,
+      selfDescription,
+      jobDescription,
+      ...interViewReportByAi,
+    });
+
+    res.status(201).json({
+      message: "Interview report generated successfully.",
+      interviewReport,
+    });
+  } catch (error) {
+    console.error("Error in generateInterViewReportController:", error);
+    try {
+      const fs = require("fs");
+      const logMsg = `[${new Date().toISOString()}] Error: ${error.message}\nStack: ${error.stack}\n\n`;
+      fs.appendFileSync("./error_log.txt", logMsg);
+    } catch (fsErr) {
+      console.error("Failed to write to local error log file:", fsErr);
+    }
+    res.status(500).json({
+      message: "Failed to generate interview report: " + error.message,
+    });
+  }
 }
 
 /**
@@ -64,7 +106,7 @@ async function getAllInterviewReportsController(req, res) {
     .find({ user: req.user.id })
     .sort({ createdAt: -1 })
     .select(
-      "-resume -selfDescription -jobDescription -__v -technicalQuestions -behavioralQuestions -skillGaps -preparationPlan",
+      "-resume -selfDescription -__v -preparationPlan",
     );
 
   res.status(200).json({

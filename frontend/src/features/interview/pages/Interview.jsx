@@ -1,8 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import "../../../style/interview.scss";
 import { useInterview } from "../hooks/useInterview.js";
-import { useNavigate, useParams } from "react-router";
-const { report, getReportById, loading, getResumePdf } = useInterview();
+import { useParams, useNavigate } from "react-router";
 
 const NAV_ITEMS = [
   {
@@ -131,14 +130,9 @@ const RoadMapDay = ({ day }) => (
 // ── Main Component ────────────────────────────────────────────────────────────
 const Interview = () => {
   const [activeNav, setActiveNav] = useState("technical");
-  const { report, getReportById, loading } = useInterview();
+  const { report, loading, getResumePdf } = useInterview();
   const { interviewId } = useParams();
-
-  useEffect(() => {
-    if (interviewId) {
-      getReportById(interviewId);
-    }
-  }, [interviewId]);
+  const navigate = useNavigate();
 
   if (loading || !report) {
     return (
@@ -161,6 +155,46 @@ const Interview = () => {
         {/* ── Left Nav ── */}
         <nav className="interview-nav">
           <div className="nav-content">
+            <button
+              onClick={() => navigate("/recent")}
+              style={{
+                backgroundColor: "transparent",
+                border: "1px solid #2a3348",
+                color: "#7d8590",
+                width: "32px",
+                height: "32px",
+                borderRadius: "0.375rem",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginBottom: "1.5rem",
+                transition: "all 0.2s"
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.borderColor = "#ff2d78";
+                e.currentTarget.style.color = "#ff2d78";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.borderColor = "#2a3348";
+                e.currentTarget.style.color = "#7d8590";
+              }}
+              title="Back to Recent Plans"
+            >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+              </svg>
+            </button>
             <p className="interview-nav__label">Sections</p>
             {NAV_ITEMS.map((item) => (
               <button

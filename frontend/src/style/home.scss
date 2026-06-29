@@ -1,373 +1,819 @@
-// ── Variables ────────────────────────────────────────────────────────────────
 @use "sass:color";
-$bg-page:        #0d1117;
-$bg-card:        #161b22;
-$bg-panel:       #1c2230;
-$bg-input:       #1e2535;
-$border-color:   #2a3348;
-$text-primary:   #e6edf3;
-$text-muted:     #7d8590;
-$accent:         #ff2d78;
-$accent-alt:     #ff6b9d;
-$badge-required: #ff2d78;
-$badge-best:     #ff2d78;
-$info-bg:        #1b2a4a;
-$info-border:    #2d4a7a;
-$font-stack:     system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-// ── Page Shell ───────────────────────────────────────────────────────────────
+$bg-page:        #070a0e;
+$bg-card:        #0f131a;
+$bg-panel:       #151b24;
+$bg-input:       #0d1117;
+$border-color:   #1f2937;
+$text-primary:   #f3f4f6;
+$text-muted:     #9ca3af;
+$accent:         #ff3b8d;
+$accent-glow:    rgba(255, 59, 141, 0.15);
+$font-stack:     Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
 .home-page {
-    width: 100%;
-    min-height: 100vh;
-    background-color: $bg-page;
-    color: $text-primary;
-    font-family: $font-stack;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  font-family: $font-stack;
+  color: $text-primary;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  box-sizing: border-box;
 
+  // 1. Welcome Section
+  .welcome-section {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 3rem 1.5rem;
-    gap: 2rem;
-}
-
-// ── Page Header ──────────────────────────────────────────────────────────────
-.page-header {
-    text-align: center;
+    gap: 0.5rem;
+    text-align: left;
 
     h1 {
-        font-size: 2.25rem;
-        font-weight: 700;
-        margin-bottom: 0.5rem;
-        color: $text-primary;
+      font-size: 2rem;
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: -0.02em;
+      color: $text-primary;
     }
 
     p {
-        color: $text-muted;
-        font-size: 0.95rem;
-        max-width: 480px;
-        margin: 0 auto;
-        line-height: 1.6;
+      font-size: 1rem;
+      color: $text-muted;
+      margin: 0;
     }
+  }
 
-    .highlight {
-        color: $accent;
-    }
-}
-
-// ── Main Card ─────────────────────────────────────────────────────────────────
-.interview-card {
+  // 2. Statistics Grid
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
     width: 100%;
-    max-width: 900px;
+
+    .stat-card {
+      background-color: $bg-card;
+      border: 1px solid $border-color;
+      border-radius: 1rem;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-sizing: border-box;
+
+      &:hover {
+        border-color: $accent;
+        box-shadow: 0 8px 24px $accent-glow;
+        transform: translateY(-2px);
+      }
+
+      .stat-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: $text-muted;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+
+        .stat-icon {
+          color: $accent;
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      .stat-value {
+        font-size: 2rem;
+        font-weight: 800;
+        color: $text-primary;
+        letter-spacing: -0.02em;
+        margin-top: 0.25rem;
+      }
+
+      .stat-meta {
+        font-size: 0.8rem;
+        color: $text-muted;
+        margin-top: 0.25rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  // 3. Workflow Steps
+  .workflow-steps {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba($bg-card, 0.5);
+    border: 1px solid $border-color;
+    border-radius: 1rem;
+    padding: 1.25rem 2rem;
+    width: 100%;
+    box-sizing: border-box;
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: $text-muted;
+
+      .step-num {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background-color: rgba($text-muted, 0.1);
+        color: $text-muted;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: 700;
+      }
+
+      &.active {
+        color: $text-primary;
+
+        .step-num {
+          background-color: rgba($accent, 0.15);
+          color: $accent;
+          border: 1px solid rgba($accent, 0.3);
+        }
+      }
+    }
+
+    .step-connector {
+      flex: 1;
+      height: 1px;
+      background-color: $border-color;
+      margin: 0 1.5rem;
+      max-width: 80px;
+    }
+  }
+
+  // 4. Split Dashboard Layout
+  .dashboard-layout {
+    display: grid;
+    grid-template-columns: 1.8fr 1.2fr;
+    gap: 2rem;
+    align-items: start;
+    width: 100%;
+  }
+
+  .create-plan-layout {
+    max-width: 820px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+  // Left Panel - Creator Form
+  .form-panel {
     background-color: $bg-card;
     border: 1px solid $border-color;
     border-radius: 1rem;
-    overflow: hidden;
+    padding: 2.25rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    box-sizing: border-box;
 
-    &__body {
+    .form-section {
         display: flex;
-        min-height: 520px;
-    }
+        flex-direction: column;
+        gap: 0.75rem;
 
-    &__footer {
+        .section-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          h3 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            margin: 0;
+            color: $text-primary;
+          }
+
+          .required-badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: $accent;
+            background-color: rgba($accent, 0.1);
+            padding: 0.15rem 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px solid rgba($accent, 0.2);
+          }
+        }
+
+        .input-wrapper {
+          position: relative;
+        }
+
+        textarea {
+          width: 100%;
+          min-height: 160px;
+          background-color: $bg-input;
+          border: 1px solid $border-color;
+          border-radius: 0.75rem;
+          padding: 1rem;
+          color: $text-primary;
+          font-family: $font-stack;
+          font-size: 0.9rem;
+          line-height: 1.6;
+          resize: vertical;
+          outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+          box-sizing: border-box;
+
+          &:focus {
+            border-color: $accent;
+            box-shadow: 0 0 0 3px rgba($accent, 0.1);
+          }
+
+          &::placeholder {
+            color: $text-muted;
+          }
+
+          &.short-desc {
+            min-height: 100px;
+          }
+        }
+
+        .char-counter {
+          font-size: 0.75rem;
+          color: $text-muted;
+          text-align: right;
+          margin-top: 0.25rem;
+        }
+      }
+
+      .form-grid-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        width: 100%;
+        align-items: stretch;
+
+        @media (max-width: 640px) {
+          grid-template-columns: 1fr;
+        }
+
+        .form-section {
+          height: 100%;
+          display: flex;
+          flex-direction: column;
+          margin-bottom: 0;
+
+          .dropzone, textarea.short-desc {
+            flex: 1;
+            box-sizing: border-box;
+          }
+        }
+      }
+
+      // Resume Dropzone Area
+      .dropzone {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 2.25rem 1.5rem;
+        background-color: $bg-input;
+        border: 2px dashed $border-color;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: border-color 0.2s, background-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        box-sizing: border-box;
+
+        &:hover {
+          border-color: $accent;
+          background-color: rgba($accent, 0.03);
+          box-shadow: 0 0 15px rgba($accent, 0.05);
+        }
+
+        &.dragging {
+          border-color: $accent;
+          background-color: rgba($accent, 0.05);
+          transform: scale(1.01);
+        }
+
+        .dropzone-icon {
+          color: $accent;
+          margin-bottom: 0.25rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.875rem;
+          font-weight: 600;
+          text-align: center;
+          color: $text-primary;
+        }
+
+        .subtitle {
+          font-size: 0.75rem;
+          color: $text-muted;
+          text-align: center;
+        }
+      }
+
+      // Uploaded File Info Card
+      .file-card {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 1rem 1.5rem;
-        border-top: 1px solid $border-color;
-
-        .footer-info {
-            font-size: 0.8rem;
-            color: $text-muted;
-        }
-    }
-}
-
-// ── Panels ────────────────────────────────────────────────────────────────────
-.panel-divider {
-    width: 1px;
-    background-color: $border-color;
-    flex-shrink: 0;
-}
-
-.panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    padding: 1.5rem;
-
-    &__header {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 0.25rem;
-
-        h2 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: $text-primary;
-            flex: 1;
-        }
-    }
-
-    &__icon {
-        display: flex;
-        align-items: center;
-        color: $accent;
-    }
-
-    &__textarea {
-        flex: 1;
-        width: 100%;
         background-color: $bg-input;
-        border: 1px solid $border-color;
-        border-radius: 0.5rem;
-        padding: 0.75rem 1rem;
-        color: $text-primary;
-        font-family: $font-stack;
-        font-size: 0.875rem;
-        resize: none;
-        outline: none;
-        transition: border-color 0.2s;
-        line-height: 1.5;
+        border: 1px solid rgba($accent, 0.2);
+        border-radius: 0.75rem;
+        padding: 0.875rem 1.25rem;
+        box-sizing: border-box;
 
-        &::placeholder {
-            color: $text-muted;
-        }
+        .file-info {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          overflow: hidden;
 
-        &:focus {
-            border-color: $accent;
-        }
-
-        &--short {
-            flex: unset;
-            height: 96px;
-        }
-    }
-
-    &--left {
-        position: relative;
-
-        .char-counter {
-            position: absolute;
-            bottom: 2.25rem;
-            right: 2rem;
-            font-size: 0.75rem;
-            color: $text-muted;
-        }
-    }
-
-    &--right {
-        gap: 0.75rem;
-    }
-}
-
-// ── Badges ────────────────────────────────────────────────────────────────────
-.badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.15rem 0.5rem;
-    border-radius: 0.3rem;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-
-    &--required {
-        background-color: rgba($badge-required, 0.15);
-        color: $badge-required;
-        border: 1px solid rgba($badge-required, 0.3);
-    }
-
-    &--best {
-        background-color: rgba($badge-best, 0.15);
-        color: $badge-best;
-        border: 1px solid rgba($badge-best, 0.3);
-    }
-}
-
-// ── Section Label ─────────────────────────────────────────────────────────────
-.section-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: $text-primary;
-    margin-bottom: 0.25rem;
-}
-
-// ── Dropzone ──────────────────────────────────────────────────────────────────
-.upload-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.dropzone {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.35rem;
-    padding: 1.5rem 1rem;
-    background-color: $bg-input;
-    border: 2px dashed $border-color;
-    border-radius: 0.6rem;
-    cursor: pointer;
-    transition: border-color 0.2s, background-color 0.2s;
-
-    &:hover {
-        border-color: $accent;
-        background-color: rgba($accent, 0.05);
-    }
-
-    &__icon {
-        color: $accent;
-        margin-bottom: 0.25rem;
-    }
-
-    &__title {
-        font-size: 0.875rem;
-        font-weight: 500;
-        color: $text-primary;
-        margin: 0;
-    }
-
-    &__subtitle {
-        font-size: 0.75rem;
-        color: $text-muted;
-        margin: 0;
-    }
-}
-
-// ── OR Divider ────────────────────────────────────────────────────────────────
-.or-divider {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: $text-muted;
-    font-size: 0.75rem;
-
-    &::before,
-    &::after {
-        content: '';
-        flex: 1;
-        height: 1px;
-        background-color: $border-color;
-    }
-
-    span {
-        white-space: nowrap;
-    }
-}
-
-// ── Self Description ──────────────────────────────────────────────────────────
-.self-description {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-// ── Info Box ──────────────────────────────────────────────────────────────────
-.info-box {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.6rem;
-    padding: 0.75rem 1rem;
-    background-color: $info-bg;
-    border: 1px solid $info-border;
-    border-radius: 0.5rem;
-
-    &__icon {
-        flex-shrink: 0;
-        color: #4a90e2;
-        margin-top: 1px;
-    }
-
-    p {
-        margin: 0;
-        font-size: 0.8rem;
-        color: #8ab4f8;
-        line-height: 1.5;
-
-        strong {
-            color: $text-primary;
-        }
-    }
-}
-
-// ── Generate Button ───────────────────────────────────────────────────────────
-.generate-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, $accent 0%, color.adjust($accent, $lightness: -10%) 100%);
-    color: #fff;
-    font-size: 0.9rem;
-    font-weight: 600;
-    border: none;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: opacity 0.2s, transform 0.1s;
-    font-family: $font-stack;
-
-    &:hover {
-        opacity: 0.9;
-    }
-
-    &:active {
-        transform: scale(0.98);
-    }
-}
-
-.recent-reports{
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    width: 100%;
-    max-width: 900px;
-
-    .reports-list{
-        display: flex;
-        gap: 0.75rem;
-        flex-wrap: wrap;
-
-        .report-item{
-            background-color: $bg-card;
-            border: 1px solid $border-color;
+          .file-icon {
+            width: 36px;
+            height: 36px;
             border-radius: 0.5rem;
-            padding: 1rem;
-            flex: 1;
+            background-color: rgba($accent, 0.1);
+            color: $accent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+          }
+
+          .file-meta {
             display: flex;
             flex-direction: column;
-            gap: 0.5rem;
-            cursor: pointer;
-            flex-shrink: 0;
+            gap: 0.15rem;
+            overflow: hidden;
 
-            .match-score {
-                font-size: 0.8rem;
-                font-weight: 600;
-                color: $accent;
-                align-items: flex-start;
+            .name {
+              font-size: 0.875rem;
+              font-weight: 600;
+              color: $text-primary;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
+
+            .size {
+              font-size: 0.75rem;
+              color: $text-muted;
+            }
+          }
         }
-    }
-}
 
-// ── Page Footer ───────────────────────────────────────────────────────────────
-.page-footer {
-    display: flex;
-    gap: 1.5rem;
+        .file-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
 
-    a {
-        font-size: 0.8rem;
-        color: $text-muted;
-        text-decoration: none;
-        transition: color 0.2s;
+          .badge {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #4caf50;
+            background-color: rgba(#4caf50, 0.1);
+            border: 1px solid rgba(#4caf50, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 2rem;
+            text-transform: uppercase;
+          }
+
+          .remove-btn {
+            background-color: rgba(255,255,255,0.03);
+            border: 1px solid $border-color;
+            color: $text-muted;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+              background-color: rgba($accent, 0.15);
+              border-color: rgba($accent, 0.3);
+              color: $accent;
+              transform: scale(1.05);
+            }
+          }
+        }
+      }
+
+      // OR Divider
+      .or-divider {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        color: #4b5563;
+        font-size: 0.75rem;
+        font-weight: 700;
+        margin: 0.5rem 0;
+
+        .line {
+          flex: 1;
+          height: 1px;
+          background-color: #1f2937;
+        }
+      }
+
+      // Generate Button
+      .generate-btn-wrapper {
+        margin-top: 0.5rem;
+      }
+
+      .gradient-generate-btn {
+        width: 100%;
+        padding: 1.1rem;
+        background: linear-gradient(135deg, $accent 0%, color.adjust($accent, $lightness: -12%) 100%);
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+        border: none;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.6rem;
+        box-shadow: 0 4px 16px rgba($accent, 0.25);
+        transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s;
 
         &:hover {
-            color: $text-primary;
+          box-shadow: 0 6px 24px rgba($accent, 0.4);
+          transform: translateY(-1px);
         }
+
+        &:active {
+          transform: translateY(1px);
+        }
+
+        &:disabled {
+          background: rgba($border-color, 0.4) !important;
+          border: 1px solid rgba($border-color, 0.8) !important;
+          color: rgba($text-muted, 0.4) !important;
+          box-shadow: none !important;
+          cursor: not-allowed;
+          transform: none !important;
+        }
+
+        .sparkle-icon {
+          animation: spin-slow 4s infinite linear;
+        }
+      }
+  }
+
+  // Right Side - AI Sidebar
+  .dashboard-layout {
+    .sidebar-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+
+      .info-card {
+        background-color: $bg-card;
+        border: 1px solid $border-color;
+        border-radius: 1rem;
+        padding: 1.75rem;
+        box-sizing: border-box;
+
+        h3 {
+          font-size: 1.05rem;
+          font-weight: 700;
+          margin: 0 0 1.25rem 0;
+          color: $text-primary;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+
+          svg {
+            color: $accent;
+          }
+        }
+
+        .process-list {
+          display: flex;
+          flex-direction: column;
+          gap: 1.25rem;
+          position: relative;
+
+          &::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 14px;
+            bottom: 10px;
+            width: 1px;
+            background-color: $border-color;
+            z-index: 0;
+          }
+
+          .process-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            position: relative;
+            z-index: 1;
+
+            .bullet {
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              background-color: $bg-page;
+              border: 1px solid $border-color;
+              color: $accent;
+              font-size: 0.8rem;
+              font-weight: 700;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              flex-shrink: 0;
+            }
+
+            .content {
+              display: flex;
+              flex-direction: column;
+              gap: 0.15rem;
+
+              h4 {
+                font-size: 0.875rem;
+                font-weight: 600;
+                color: $text-primary;
+                margin: 0;
+                text-align: left;
+              }
+
+              p {
+                font-size: 0.8rem;
+                color: $text-muted;
+                line-height: 1.5;
+                margin: 0;
+                text-align: left;
+              }
+            }
+          }
+        }
+      }
     }
+  }
+
+  // 5. Recent Reports Section
+  .recent-reports-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 1rem;
+
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      h2 {
+        font-size: 1.35rem;
+        font-weight: 700;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+    }
+
+    .reports-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      width: 100%;
+    }
+
+    // Modern SaaS Cards
+    .report-card {
+      background-color: $bg-card;
+      border: 1px solid $border-color;
+      border-radius: 1rem;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      transition: all 0.25s ease;
+      position: relative;
+      box-sizing: border-box;
+
+      &:hover {
+        border-color: rgba($accent, 0.4);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 20px rgba($accent, 0.05);
+      }
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+
+        .title-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 0.25rem;
+
+          h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: $text-primary;
+            margin: 0;
+            text-align: left;
+          }
+
+          .date {
+            font-size: 0.8rem;
+            color: $text-muted;
+            text-align: left;
+          }
+        }
+
+        .score-badge {
+          font-size: 0.8rem;
+          font-weight: 700;
+          padding: 0.25rem 0.6rem;
+          border-radius: 2rem;
+
+          &.high {
+            color: #4caf50;
+            background-color: rgba(#4caf50, 0.1);
+            border: 1px solid rgba(#4caf50, 0.2);
+          }
+          &.mid {
+            color: #ff9800;
+            background-color: rgba(#ff9800, 0.1);
+            border: 1px solid rgba(#ff9800, 0.2);
+          }
+          &.low {
+            color: #f44336;
+            background-color: rgba(#f44336, 0.1);
+            border: 1px solid rgba(#f44336, 0.2);
+          }
+        }
+      }
+
+      .card-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-top: 1px solid rgba($border-color, 0.5);
+        padding-top: 1.25rem;
+
+        .view-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.4rem;
+          padding: 0.5rem 1rem;
+          background-color: rgba($accent, 0.08);
+          border: 1px solid rgba($accent, 0.2);
+          color: $accent;
+          border-radius: 0.5rem;
+          font-size: 0.85rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover {
+            background-color: $accent;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba($accent, 0.2);
+          }
+        }
+
+        .delete-btn {
+          width: 32px;
+          height: 32px;
+          border-radius: 0.5rem;
+          border: 1px solid $border-color;
+          background-color: transparent;
+          color: $text-muted;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &:hover {
+            background-color: rgba(#f44336, 0.15);
+            border-color: rgba(#f44336, 0.3);
+            color: #f44336;
+          }
+        }
+      }
+    }
+
+    // Empty State Illustration
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      background-color: $bg-card;
+      border: 1px dashed $border-color;
+      border-radius: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.25rem;
+
+      .empty-icon {
+        color: $text-muted;
+        opacity: 0.5;
+        animation: float 4s infinite ease-in-out;
+      }
+
+      h3 {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: $text-primary;
+        margin: 0;
+      }
+
+      p {
+        font-size: 0.9rem;
+        color: $text-muted;
+        max-width: 380px;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .btn-create {
+        padding: 0.6rem 1.25rem;
+        background-color: rgba($accent, 0.08);
+        border: 1px solid rgba($accent, 0.2);
+        color: $accent;
+        font-size: 0.875rem;
+        font-weight: 600;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background-color: $accent;
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+// Spin animations
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+// Responsive layout
+@media (max-width: 900px) {
+  .home-page {
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .workflow-steps {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1.5rem;
+
+      .step-connector {
+        display: none;
+      }
+    }
+
+    .dashboard-layout {
+      grid-template-columns: 1fr;
+    }
+
+    .recent-reports-section .reports-grid {
+      grid-template-columns: 1fr;
+    }
+  }
 }
