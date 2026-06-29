@@ -3,8 +3,16 @@ import { useInterview } from "../hooks/useInterview.js";
 import "../../../style/recent.scss";
 
 const RecentPlans = () => {
-  const { loading, reports } = useInterview();
+  const { loading, reports, deleteReport } = useInterview();
   const navigate = useNavigate();
+
+  const handleDelete = async (e, id) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (window.confirm("Are you sure you want to permanently delete this interview plan?")) {
+      await deleteReport(id);
+    }
+  };
 
   const getScoreClass = (score) => {
     if (score >= 80) return "high";
@@ -146,27 +154,60 @@ const RecentPlans = () => {
                 onClick={() => navigate(`/interview/${report._id}`)}
               >
                 <div className="card-header">
-                  <div className="icon-container">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
-                      <polyline points="14 2 14 8 20 8"></polyline>
-                      <line x1="16" y1="13" x2="8" y2="13"></line>
-                      <line x1="16" y1="17" x2="8" y2="17"></line>
-                      <line x1="10" y1="9" x2="8" y2="9"></line>
-                    </svg>
-                  </div>
-                  <div className="title-section">
-                    <h3>{report.title || "Untitled Plan"}</h3>
-                    <div className="date-text">
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: "2px" }}>
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                  <div style={{ display: "flex", gap: "0.75rem", flex: 1, minWidth: 0 }}>
+                    <div className="icon-container">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <line x1="10" y1="9" x2="8" y2="9"></line>
                       </svg>
-                      {new Date(report.createdAt).toLocaleDateString()}
+                    </div>
+                    <div className="title-section" style={{ flex: 1, minWidth: 0 }}>
+                      <h3 style={{ textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap", margin: 0 }}>{report.title || "Untitled Plan"}</h3>
+                      <div className="date-text">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: "2px" }}>
+                          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                          <line x1="16" y1="2" x2="16" y2="6"></line>
+                          <line x1="8" y1="2" x2="8" y2="6"></line>
+                          <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        {new Date(report.createdAt).toLocaleDateString()}
+                      </div>
                     </div>
                   </div>
+                  <button
+                    onClick={(e) => handleDelete(e, report._id)}
+                    className="delete-btn"
+                    title="Delete Plan"
+                    style={{
+                      background: "transparent",
+                      border: "none",
+                      color: "#7d8590",
+                      cursor: "pointer",
+                      padding: "0.4rem",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "0.375rem",
+                      transition: "all 0.2s",
+                      flexShrink: 0
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.color = "#ff3b8d";
+                      e.currentTarget.style.backgroundColor = "rgba(255, 59, 141, 0.1)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.color = "#7d8590";
+                      e.currentTarget.style.backgroundColor = "transparent";
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 6 5 6 21 6"></polyline>
+                      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                    </svg>
+                  </button>
                 </div>
 
                 <p style={{

@@ -141,4 +141,45 @@ async function generateResumePdfController(req, res) {
     res.send(pdfBuffer)
 }
 
-module.exports = { generateInterViewReportController, getInterviewReportByIdController, getAllInterviewReportsController, generateResumePdfController }
+/**
+ * @description Controller to delete interview report by id.
+ */
+async function deleteInterviewReportController(req, res) {
+  try {
+    const { interviewId } = req.params;
+
+    const interviewReport = await interviewReportModel.findById(interviewId);
+
+    if (!interviewReport) {
+      return res.status(404).json({
+        message: "Interview report not found.",
+      });
+    }
+
+    // Verify ownership
+    if (interviewReport.user.toString() !== req.user.id.toString()) {
+      return res.status(403).json({
+        message: "You are not authorized to delete this report.",
+      });
+    }
+
+    await interviewReportModel.findByIdAndDelete(interviewId);
+
+    res.status(200).json({
+      message: "Interview report deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error in deleteInterviewReportController:", error);
+    res.status(500).json({
+      message: "An error occurred while deleting the interview report.",
+    });
+  }
+}
+
+module.exports = { 
+  generateInterViewReportController, 
+  getInterviewReportByIdController, 
+  getAllInterviewReportsController, 
+  generateResumePdfController,
+  deleteInterviewReportController
+}

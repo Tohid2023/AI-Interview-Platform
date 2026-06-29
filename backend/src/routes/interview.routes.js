@@ -18,12 +18,12 @@ interviewRouter.post(
 );
 
 /**
- * @route GET /api/interview/report/:interviewId
+ * @route GET /api/interview/:interviewId
  * @description get interview report by interviewId.
  * @access private
  */
 interviewRouter.get(
-  "/report/:interviewId",
+  "/:interviewId",
   authMiddleware.authUser,
   interviewController.getInterviewReportByIdController,
 );
@@ -40,10 +40,25 @@ interviewRouter.get(
 );
 
 /**
- * @route GET /api/interview/resume/pdf
+ * @route POST /api/interview/:interviewReportId/resume/pdf
  * @description generate resume pdf on the basis of user self description, resume content and job description.
  * @access private
  */
-interviewRouter.post("/resume/pdf/:interviewReportId", authMiddleware.authUser, interviewController.generateResumePdfController)
+interviewRouter.post(
+  "/:interviewReportId/resume/pdf", 
+  authMiddleware.authUser, 
+  interviewController.generateResumePdfController
+);
+
+/**
+ * @route DELETE /api/interview/:interviewId
+ * @description delete interview report by interviewId.
+ * @access private
+ */
+interviewRouter.delete(
+  "/:interviewId",
+  authMiddleware.authUser,
+  interviewController.deleteInterviewReportController
+);
 
 module.exports = interviewRouter;
